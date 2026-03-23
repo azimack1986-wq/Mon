@@ -701,7 +701,7 @@
       <p class="section-label" style="text-align:center;">Save Your Spot</p>
       <h2>Let Us Know You're Coming</h2>
       <p class="rsvp-sub">
-        Register your interest below, then head to Grassrootz to complete your $20 donation and lock in your place.
+        Fill in your name and how many seats you need — we'll take it from there.
       </p>
 
       <div class="rsvp-form">
@@ -743,9 +743,9 @@
   </footer>
 
   <script>
-    // ── REPLACE THIS with your Google Apps Script deployment URL ──────────────
-    const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
-    // ─────────────────────────────────────────────────────────────────────────
+    // ── REPLACE THIS with your Formspree URL (e.g. https://formspree.io/f/xyzabc) ──
+    const FORMSPREE_URL = 'https://formspree.io/f/xzdjlkzp';
+    // ──────────────────────────────────────────────────────────────────────────────
 
     /* Floating hearts */
     (function spawnHearts() {
@@ -794,24 +794,22 @@
       btn.disabled = true;
       btn.textContent = 'Sending\u2026';
 
-      const payload = JSON.stringify({ name, numberOfPeople });
-
       try {
-        const response = await fetch(APPS_SCRIPT_URL, {
+        const response = await fetch(FORMSPREE_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: payload,
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ name, numberOfPeople }),
         });
 
         const data = await response.json();
 
-        if (data.status === 'success') {
+        if (data.ok) {
           showMsg("You're registered! See you on the night \u{1F49C}", 'success');
           nameEl.value = '';
           peopleEl.value = '';
           btn.textContent = 'Registered \u{1F49C}';
         } else {
-          throw new Error(data.message || 'Unknown error');
+          throw new Error('Submission failed');
         }
       } catch (err) {
         showMsg('Something went wrong \u2014 please try again.', 'error');
